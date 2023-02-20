@@ -1,9 +1,11 @@
+import AddPost from "@/app/post/AddPost";
+import PostList from "@/app/post/PostList";
+
 export default function Home() {
     return (
         <main className="">
-            <h1 className="text-4xl font-bold ">
-                Welcome to Redwood!
-            </h1>
+            <AddPost />
+            <PostList />
         </main>
     )
 }
