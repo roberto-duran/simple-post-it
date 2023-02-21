@@ -6,7 +6,7 @@ type Props = {
     name: string,
     avatar: string,
     title: string
-    comments: []
+    comments?: { id: string; content: string; postId: string; userId: string; createdAt: string; }[]
 }
 
 export default function Post({id, name, avatar, title, comments}: Props) {
@@ -24,9 +24,11 @@ export default function Post({id, name, avatar, title, comments}: Props) {
                 <p className="break-all">{title}</p>
             </div>
             <div className="flex gap-4 items-center cursor-pointer">
-                <Link href={`/post/${id}`}>
+                <Link href={{
+                    pathname: `/post/${id}`,
+                }}>
                     <p className="text-sm font-bold text-gray-700">
-                        Comments: {comments.length}
+                        Comments: {comments?.length}
                     </p>
                 </Link>
             </div>

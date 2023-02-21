@@ -14,33 +14,33 @@ export default async function handler(
             select: {
                 id: true,
             },
-           where: { email: session?.user?.email || '' }
+            where: { email: session?.user?.email || '' }
         });
 
-        //create post
+        //add a comment
         try{
-            const {title} = req.body;
+            const { title, postId } = req.body.data;
             if (!session){
                 res.statusMessage = "unauthorized";
                 return res.status(401).json({ });
             }
 
             if (title.length > 300){
-                res.statusMessage = "write a shorter title";
+                res.statusMessage = "write a shorter comment";
                 return res.status(400).json({ });
 
             }
 
             if(!title){
-                res.statusMessage = "write a title";
+                res.statusMessage = "write a comment";
                 return res.status(400).json({ });
             }
 
-           const result = await prisma.post.create({
+            const result = await prisma.comment.create({
                 data:{
-                    title,
+                    content: title,
                     userId: prismaUser?.id as string,
-                    isComplete: true
+                    postId,
                 }
             });
 

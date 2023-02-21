@@ -13,5 +13,10 @@ export type PostType = {
         postId: string;
         userId: string;
         createdAt: string;
+        user: {
+            id: string;
+            name: string;
+            image: string;
+        },
     }[]
 }

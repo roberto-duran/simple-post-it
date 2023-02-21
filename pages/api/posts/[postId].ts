@@ -8,8 +8,37 @@ export default async function handler(
     res: NextApiResponse
 ) {
     const session = await getServerSession(req, res, authOptions);
-    if (req.method === 'DELETE') {
 
+    if (req.method === 'GET') {
+        try{
+            const postId = req.query?.postId as string;
+            if (!postId) {
+                return res.status(400).json({ message: 'Post ID is required.' });
+            }
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: postId,
+                },
+                include: {
+                    user: true,
+                    Comment: {
+                        orderBy: {
+                            createdAt: 'desc',
+                        },
+                        include: {
+                            user: true,
+                        }
+                    },
+                },
+            });
+            return res.status(200).json(post);
+        }catch (e: any) {
+            res.statusMessage = "Error getting post";
+            return res.status(500).json(e);
+        }
+    }
+
+    if (req.method === 'DELETE') {
         try{
             if (!session){
                 res.statusMessage = "unauthorized";

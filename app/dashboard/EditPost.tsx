@@ -3,6 +3,7 @@ import Toggle from "@/app/dashboard/Toggle";
 import {useState} from "react";
 import {useMutation, useQueryClient} from "react-query";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 type EditPostProps = {
     id: string;
@@ -35,13 +36,13 @@ export default function EditPost({avatar, title, name, email, comments, id}: Edi
                 if(!response.ok)
                     toast.error("Error Deleting that post", { id: deleteToastId });
                 toast.success("Post has been delete", { id: deleteToastId });
-                queryClient.invalidateQueries(['posts']);
+                queryClient.invalidateQueries(['auth-posts']);
             }
         }
     );
 
     const deletePost = () => {
-        deleteToastId = toast.success("Deleting your post", { id: deleteToastId });
+        deleteToastId = toast.loading("Deleting your post", { id: deleteToastId });
         mutate(id);
     }
 
@@ -62,9 +63,13 @@ export default function EditPost({avatar, title, name, email, comments, id}: Edi
                     <p className="break-all">{title}</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <p className="text-sm font-bold text-gray-700">
-                        Comments: {comments.length}
-                    </p>
+                    <Link href={{
+                        pathname: `/post/${id}`,
+                    }}>
+                        <p className="text-sm font-bold text-gray-700">
+                            Comments: {comments.length}
+                        </p>
+                    </Link>
                     <button onClick={() => setToggle(true)}
                         className="text-sm font-bold text-red-500">
                         Delete

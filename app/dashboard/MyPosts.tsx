@@ -1,20 +1,20 @@
 'use client'
 
-import useSWR from 'swr';
 import {AuthPostsType} from "@/model/AuthPosts";
 import EditPost from "@/app/dashboard/EditPost";
-import {PostType} from "@/model/Post";
-const fetchAuth = async (url: string) => {
-    const res = await fetch(url);
-    if (!res.ok) {
-        throw new Error('An error occurred while fetching the data.');
-    }
+import {useQuery} from "react-query";
+
+const fetchAuth = async () => {
+    const res = await fetch('/api/posts/authPosts');
     return res.json();
 }
 export default function MyPosts() {
-    const {data, error, isLoading} = useSWR<AuthPostsType>('/api/posts/authPosts', fetchAuth);
+    const {data, isLoading } = useQuery<AuthPostsType>(
+        'auth-posts',
+        fetchAuth
+    );
+
     if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error...</div>;
     return (
         <div>
             {data?.Post?.map((post) => (
