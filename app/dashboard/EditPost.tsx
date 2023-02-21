@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Toggle from "@/app/dashboard/Toggle";
 import {useState} from "react";
+import {useMutation, useQueryClient} from "react-query";
+import toast from "react-hot-toast";
 
 type EditPostProps = {
     id: string;
@@ -14,11 +16,35 @@ type EditPostProps = {
         postId: string;
         userId: string;
     }[];
-    
+
 }
 
 export default function EditPost({avatar, title, name, email, comments, id}: EditPostProps) {
     const [toggle, setToggle] = useState<boolean>(false);
+    let deleteToastId: string;
+    const queryClient = useQueryClient();
+    const {mutate} = useMutation(
+        async (id: string) => await fetch(`/api/posts/${id}`, {
+            method: 'DELETE'
+        }),
+        {
+            onError: (error) => {
+                toast.error("Error Deleting that post", { id: deleteToastId });
+            },
+            onSuccess: (response) => {
+                if(!response.ok)
+                    toast.error("Error Deleting that post", { id: deleteToastId });
+                toast.success("Post has been delete", { id: deleteToastId });
+                queryClient.invalidateQueries(['posts']);
+            }
+        }
+    );
+
+    const deletePost = () => {
+        deleteToastId = toast.success("Deleting your post", { id: deleteToastId });
+        mutate(id);
+    }
+
     return (
         <>
             <div className="bg-white my-8 p-8 rounded-lg">
@@ -27,7 +53,7 @@ export default function EditPost({avatar, title, name, email, comments, id}: Edi
                            className="rounded-full"
                            alt={'user avatar'}
                            width={32}
-                           height={32} />
+                           height={32}/>
                     <h3 className="font-bold text-gray-700">
                         {name}
                     </h3>
@@ -39,12 +65,13 @@ export default function EditPost({avatar, title, name, email, comments, id}: Edi
                     <p className="text-sm font-bold text-gray-700">
                         Comments: {comments.length}
                     </p>
-                    <button className="text-sm font-bold text-red-500">
+                    <button onClick={() => setToggle(true)}
+                        className="text-sm font-bold text-red-500">
                         Delete
                     </button>
                 </div>
             </div>
-            {toggle && <Toggle />}
+            {toggle && <Toggle deletePost={deletePost} setToggle={setToggle} />}
         </>
 
     );
